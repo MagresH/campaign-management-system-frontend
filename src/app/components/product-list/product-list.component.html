@@ -1,13 +1,24 @@
 <div class="product-list">
-  <h1>Your Products</h1>
-  <button routerLink="/products/new">Add New Product</button>
-  <ul>
-    <li *ngFor="let product of products">
-      <h3>{{ product.name }}</h3>
-      <p>{{ product.description }}</p>
-      <p>Price: {{ product.price | currency }}</p>
-      <button [routerLink]="['/products/edit', product.id]">Edit</button>
-      <button (click)="createCampaign(product.id)">Create Campaign</button>
-    </li>
-  </ul>
+  <div class="card">
+    <div class="header">
+      <h1>Your Products</h1>
+      <button class="add-product-button" routerLink="/products/new">Add New Product</button>
+    </div>
+    <ul>
+      <li *ngFor="let product of products" class="product-item">
+        <div class="product-details">
+          <h3>{{ product.name }}</h3>
+          <p>{{ product.description }}</p>
+          <p>Price: {{ product.price | currency }}</p>
+        </div>
+        <div class="product-actions">
+          <button class="create-campaign-button" (click)="createCampaign(product.id)">Create Campaign</button>
+          <div class="right-actions">
+            <button class="edit-button" routerLink="/products/edit/{{ product.id }}">Edit</button>
+            <button class="delete-button" (click)="deleteProduct(product.id)">Delete</button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
 </div>

@@ -24,7 +24,7 @@ export class ProductListComponent implements OnInit {
     if (this.sellerId) {
       this.fetchProducts();
     } else {
-      this.router.navigate(['/']);
+      this.router.navigate(['/seller-setup']).then(r => console.log('navigated to home'));
     }
   }
 
@@ -40,7 +40,17 @@ export class ProductListComponent implements OnInit {
   }
 
   createCampaign(productId: string) {
-    this.router.navigate(['/campaigns/new', productId]);
+    this.router.navigate(['/campaigns/new', productId]).then(r =>  console.log('navigated to campaign'));
+  }
+
+  deleteProduct(productId: string) {
+    this.productService.deleteProduct(productId).subscribe({
+      next: () => {
+        this.products = this.products.filter(product => product.id !== productId);
+      },
+      error: (error) => {
+        console.error('Error deleting product:', error);
+      },
+    });
   }
 }
-

@@ -1,67 +1,71 @@
-import {Component, OnInit, effect, inject, signal, computed} from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   Validators,
-  FormsModule,
-  ReactiveFormsModule,
+  FormControl, ReactiveFormsModule,
 } from '@angular/forms';
-import {CampaignService, Campaign, CampaignStatus} from '../../services/campaign.service';
+import { CampaignService, Campaign, CampaignStatus } from '../../services/campaign.service';
 import { ProductService, Product } from '../../services/product.service';
 import { KeywordService } from '../../services/keyword.service';
 import { LocationService } from '../../services/location.service';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import {
-  MatAutocompleteModule,
-  MatAutocompleteSelectedEvent,
-} from '@angular/material/autocomplete';
-import {
-  MatChipsModule,
-  MatChipInputEvent,
-} from '@angular/material/chips';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { CommonModule } from '@angular/common';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { ActivatedRoute, Router } from '@angular/router';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { of } from 'rxjs';
+import { debounceTime, switchMap, catchError, distinctUntilChanged } from 'rxjs/operators';
+import {MatChipGrid, MatChipInput, MatChipInputEvent, MatChipRow} from '@angular/material/chips';
+import {
+  MatAutocomplete,
+  MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger,
+  MatOption
+} from '@angular/material/autocomplete';
+import {KeyValuePipe, NgForOf} from '@angular/common';
+import {MatFormField, MatLabel, MatSelect} from '@angular/material/select';
+import {MatInput} from '@angular/material/input';
+import {MatIcon} from '@angular/material/icon';
+import {MatButton} from '@angular/material/button';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-campaign-form',
   templateUrl: './campaign-form.component.html',
   styleUrls: ['./campaign-form.component.css'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
-    FormsModule,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    MatOption,
+    MatLabel,
+    KeyValuePipe,
+    MatSelect,
+    MatFormField,
     ReactiveFormsModule,
-    RouterModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatChipsModule,
-    MatIconModule,
-    MatAutocompleteModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatSlideToggleModule,
-  ],
+    MatInput,
+    MatChipGrid,
+    MatChipInput,
+    MatChipRow,
+    MatIcon,
+    NgForOf,
+    MatButton
+  ]
 })
 export class CampaignFormComponent implements OnInit {
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
-  readonly selectedKeywords = signal<string[]>([]);
-  readonly filteredKeywords = signal<string[]>([]);
-  readonly keywordQuery$ = signal<string>('');
+  selectedKeywords = signal<string[]>([]);
+  filteredKeywords = signal<string[]>([]);
+  keywordCtrl = new FormControl('');
+
   campaignStatus = CampaignStatus;
   campaignForm: FormGroup;
   isEditMode = false;
   campaignId: string | null = null;
   sellerId: string | null = null;
-  readonly products = signal<Product[]>([]);
-  readonly towns = signal<string[]>([]);
-  readonly filteredTowns = computed(() => {
+  products = signal<Product[]>([]);
+  towns = signal<string[]>([]);
+  filteredTowns = computed(() => {
     const currentTown = this.campaignForm.get('town')?.value?.toLowerCase() || '';
     return currentTown
       ? this.towns().filter((town) => town.toLowerCase().includes(currentTown))
@@ -69,7 +73,6 @@ export class CampaignFormComponent implements OnInit {
   });
 
   readonly announcer = inject(LiveAnnouncer);
-  currentKeyword: string = '';
   productId: string = '';
 
   constructor(
@@ -78,6 +81,7 @@ export class CampaignFormComponent implements OnInit {
     private productService: ProductService,
     private keywordService: KeywordService,
     private locationService: LocationService,
+    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -88,46 +92,49 @@ export class CampaignFormComponent implements OnInit {
       status: [CampaignStatus.ON, Validators.required],
       town: ['', Validators.required],
       radius: [null, [Validators.required, Validators.min(1)]],
+      productId: ['', Validators.required], // Add this line
     });
 
-    effect(() => {
-      const query = this.currentKeyword.trim();
-      if (query && query.length >= 2) {
-        this.keywordService.getKeywordsByQuery(query).subscribe({
-          next: (keywords) => {
-            const filtered = keywords.filter(
-              (keyword) => !this.selectedKeywords().includes(keyword)
-            );
-            this.filteredKeywords.set(filtered);
-          },
-          error: (error) => {
-            console.error('Error fetching keywords:', error);
-            this.filteredKeywords.set([]);
-          },
-        });
-      } else {
-        this.filteredKeywords.set([]);
-      }
-    });
   }
 
   ngOnInit(): void {
     this.sellerId = localStorage.getItem('sellerId');
     if (!this.sellerId) {
-      this.router.navigate(['/']);
+      this.router.navigate(['/seller-setup']);
       return;
     }
     this.loadProducts();
     this.loadTowns();
 
     this.productId = this.route.snapshot.paramMap.get('productId') || '';
-
     this.campaignId = this.route.snapshot.paramMap.get('id');
+
     if (this.campaignId) {
       this.isEditMode = true;
       this.loadCampaign();
     }
+
+    this.keywordCtrl.valueChanges.pipe(
+      debounceTime(100),
+      distinctUntilChanged(),
+      switchMap(value => {
+        if (value && value.length >= 0) {
+          return this.keywordService.getKeywordsByQuery(value).pipe(
+            catchError(() => of([]))
+          );
+        } else {
+          return of([]);
+        }
+      })
+    ).subscribe(keywords => {
+      const filtered = keywords.filter(
+        (keyword) => !this.selectedKeywords().includes(keyword)
+      );
+      this.filteredKeywords.set(filtered);
+    });
   }
+
+
 
   loadProducts() {
     this.productService.getProductsBySellerId(this.sellerId!).subscribe({
@@ -150,18 +157,20 @@ export class CampaignFormComponent implements OnInit {
       },
     });
   }
-
   loadCampaign() {
     this.campaignService.getCampaignById(this.campaignId!).subscribe({
       next: (campaign) => {
         this.campaignForm.patchValue(campaign);
         this.selectedKeywords.set(campaign.keywords);
+        this.productId = campaign.productId;
       },
       error: (error) => {
         console.error('Error loading campaign:', error);
       },
     });
   }
+
+
 
   saveCampaign() {
     if (this.campaignForm.invalid) {
@@ -170,37 +179,34 @@ export class CampaignFormComponent implements OnInit {
     }
     const productId = this.productId;
     const sellerId = this.sellerId!;
-    if (!productId || !sellerId) {
-      console.error('Product ID or Seller ID is missing.');
+
+    if (!productId) {
+      console.error('Product ID is missing.');
       return;
     }
+    if (!sellerId) {
+      console.error('Seller ID is missing.');
+      return;
+    }
+
     const campaign: Campaign = {
       ...this.campaignForm.value,
       keywords: this.selectedKeywords(),
       productId: productId,
       sellerId: sellerId,
     };
+
     if (this.isEditMode) {
       this.campaignService.updateCampaign(this.campaignId!, campaign).subscribe({
         next: () => {
           this.router.navigate(['/campaigns']);
         },
         error: (error) => {
-          console.error('Error updating campaign:', error);
         },
       });
     } else {
-      this.campaignService.createCampaign(campaign).subscribe({
-        next: () => {
-          this.router.navigate(['/campaigns']);
-        },
-        error: (error) => {
-          console.error('Error creating campaign:', error);
-        },
-      });
     }
   }
-
 
   add(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
@@ -217,18 +223,13 @@ export class CampaignFormComponent implements OnInit {
       });
     }
 
-    this.currentKeyword = '';
+    event.chipInput!.clear();
+    this.keywordCtrl.setValue('');
   }
 
   remove(keyword: string): void {
-    this.selectedKeywords.update((keywords) => {
-      const index = keywords.indexOf(keyword);
-      if (index >= 0) {
-        keywords.splice(index, 1);
-        this.announcer.announce(`Removed ${keyword}`);
-      }
-      return [...keywords];
-    });
+    this.selectedKeywords.update((keywords) => keywords.filter(k => k !== keyword));
+    this.announcer.announce(`Removed ${keyword}`);
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
@@ -237,7 +238,7 @@ export class CampaignFormComponent implements OnInit {
       this.selectedKeywords.update((keywords) => [...keywords, value]);
       this.announcer.announce(`Selected ${value}`);
     }
-    this.currentKeyword = '';
-    event.option.deselect();
+
+    this.keywordCtrl.setValue('');
   }
 }

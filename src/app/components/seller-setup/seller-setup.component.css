@@ -10,12 +10,9 @@ body {
 }
 
 .seller-setup {
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  padding: 20px;
 }
 
 .card {
@@ -24,6 +21,7 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   max-width: 500px;
   width: 100%;
+  margin-top: 120px;
   padding: 40px;
   text-align: center;
 }

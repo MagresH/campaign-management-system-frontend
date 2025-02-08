@@ -1,3 +1,3 @@
-<div class="account-balance" *ngIf="sellerId">
-  <p>Emerald Account Balance: {{ balance | currency }}</p>
-</div>
+<span class="account-balance" *ngIf="sellerId">
+  Emerald Account Balance: {{ balance | currency:'USD':'symbol':'1.0-0' }}
+</span>

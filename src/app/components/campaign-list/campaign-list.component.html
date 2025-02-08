@@ -1,11 +1,13 @@
 <div class="campaign-list-container">
-  <div class="campaign-list">
-    <h1>Your Campaigns</h1>
-    <button mat-raised-button color="primary" routerLink="/campaigns/new">
-      Create New Campaign
-    </button>
+  <div class="card">
+    <div class="header">
+      <h1>Your Campaigns</h1>
+      <button class="add-campaign-button" routerLink="/products">
+        Create New Campaign
+      </button>
+    </div>
 
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" class="campaign-table">
 
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef> Name </th>
@@ -40,10 +42,10 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef> Actions </th>
         <td mat-cell *matCellDef="let campaign">
-          <button mat-icon-button color="accent" (click)="editCampaign(campaign.id!)">
+          <button class="edit-button" routerLink="/campaigns/edit/{{ campaign.id }}">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button color="warn" (click)="deleteCampaign(campaign.id!)">
+          <button class="delete-button" (click)="deleteCampaign(campaign.id!)">
             <mat-icon>delete</mat-icon>
           </button>
         </td>

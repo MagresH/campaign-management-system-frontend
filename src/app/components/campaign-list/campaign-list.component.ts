@@ -69,7 +69,7 @@ export class CampaignListComponent implements OnInit {
         this.pageSize = data.size;
       },
       error: (error) => {
-        console.error('Błąd podczas pobierania kampanii:', error);
+        console.error('Error deleting product:', error);
       },
     });
   }
@@ -78,9 +78,14 @@ export class CampaignListComponent implements OnInit {
     this.loadCampaigns(event.pageIndex, event.pageSize);
   }
 
-  editCampaign(campaignId: string): void {
-  }
-
   deleteCampaign(campaignId: string): void {
+    this.campaignService.deleteCampaign(campaignId).subscribe({
+      next: () => {
+        this.dataSource.data = this.dataSource.data.filter(campaign => campaign.id !== campaignId);
+      },
+      error: (error) => {
+        console.error('Error deleting product:', error);
+      },
+    });
   }
 }

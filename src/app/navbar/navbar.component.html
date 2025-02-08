@@ -1,0 +1,20 @@
+<mat-toolbar color="primary" class="navbar">
+  <div class="navbar-content">
+    <a routerLink="/" class="navbar-brand">Campaign Management System</a>
+    <nav *ngIf="sellerId" class="nav-links">
+      <a mat-button class="button" routerLink="/products">Products</a>
+      <a mat-button class="button" routerLink="/campaigns">Campaigns</a>
+    </nav>
+    <span class="spacer"></span>
+    <app-account-balance *ngIf="sellerId"></app-account-balance>
+
+    <button
+      mat-button
+      class="logout-button"
+      (click)="logout()"
+      *ngIf="sellerId"
+    >
+      Logout
+    </button>
+  </div>
+</mat-toolbar>

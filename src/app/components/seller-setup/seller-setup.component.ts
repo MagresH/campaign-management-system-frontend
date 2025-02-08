@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { SellerService, Seller } from '../../services/seller.service';
+import { SellerService } from '../../services/seller.service';
 import { AccountService } from '../../services/account.service';
-import {FormsModule} from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-seller-setup',
   templateUrl: './seller-setup.component.html',
   styleUrls: ['./seller-setup.component.css'],
+  standalone: true,
   imports: [
     FormsModule
   ]
@@ -20,8 +22,16 @@ export class SellerSetupComponent {
   constructor(
     private sellerService: SellerService,
     private accountService: AccountService,
+    private authService: AuthService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {
+    const sellerId = this.authService.getSellerId();
+    if (sellerId) {
+      this.router.navigate(['/products']);
+    }
+  }
 
   createSellerAndAccount() {
     if (!this.sellerName) {
@@ -31,27 +41,24 @@ export class SellerSetupComponent {
 
     this.loading = true;
 
-    this.sellerService
-      .createSeller({ name: this.sellerName })
-      .subscribe({
-        next: (seller) => {
-          this.accountService
-            .createAccount(seller.id, this.initialBalance)
-            .subscribe({
-              next: () => {
-                localStorage.setItem('sellerId', seller.id);
-                this.router.navigate(['/products']);
-              },
-              error: (error) => {
-                console.error('Error creating account:', error);
-                this.loading = false;
-              },
-            });
-        },
-        error: (error) => {
-          console.error('Error creating seller:', error);
-          this.loading = false;
-        },
-      });
+    this.sellerService.createSeller({ name: this.sellerName }).subscribe({
+      next: (seller) => {
+        this.accountService.createAccount(seller.id, this.initialBalance).subscribe({
+          next: () => {
+            this.authService.setSellerId(seller.id);
+            this.loading = false;
+            this.router.navigate(['/products']);
+          },
+          error: (error) => {
+            console.error('Error creating account:', error);
+            this.loading = false;
+          },
+        });
+      },
+      error: (error) => {
+        console.error('Error creating seller:', error);
+        this.loading = false;
+      },
+    });
   }
 }

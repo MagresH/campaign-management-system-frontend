@@ -1,0 +1,57 @@
+.navbar {
+  padding: 0 20px;
+  background-color: #333333;
+}
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.navbar-brand {
+  color: #ffffff;
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.navbar-brand:hover {
+  text-decoration: none;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.account-balance {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.button {
+  margin-left: 30px;
+  color: #ffffff !important;
+  font-weight: bold;
+  border-radius: 4px;
+  border: 1px solid #ffffff;
+}
+
+.button:hover {
+  background-color: #ffffff;
+  color: #333333  !important;;
+}
+
+.logout-button {
+  margin-left: 10px;
+  background-color: #ffffff;
+  color: #333333;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+.logout-button:hover {
+  background-color: rgb(236, 236, 236);
+}
