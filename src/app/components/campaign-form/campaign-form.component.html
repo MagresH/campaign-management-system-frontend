@@ -1,0 +1,105 @@
+<div class="form-container">
+  <div class="form-wrapper">
+    <h1>{{ isEditMode ? 'Edit Campaign' : 'Create New Campaign' }}</h1>
+
+    <form [formGroup]="campaignForm" (ngSubmit)="saveCampaign()" class="campaign-form">
+      <!-- Campaign Name -->
+      <mat-form-field appearance="fill" class="form-field">
+        <mat-label>Campaign Name</mat-label>
+        <input matInput formControlName="name" required />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="form-field">
+        <mat-label>Keywords</mat-label>
+        <mat-chip-grid #chipGrid aria-label="Keyword selection">
+          <mat-chip-row *ngFor="let keyword of selectedKeywords()" (removed)="remove(keyword)">
+            {{ keyword }}
+            <button matChipRemove [attr.aria-label]="'remove ' + keyword">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip-row>
+        </mat-chip-grid>
+        <input
+          name="currentKeyword"
+          placeholder="Add a keyword"
+          [(ngModel)]="currentKeyword"
+          [matChipInputFor]="chipGrid"
+          [matAutocomplete]="auto"
+          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+          (matChipInputTokenEnd)="add($event)"
+        />
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+          <mat-option *ngFor="let keyword of filteredKeywords()" [value]="keyword">
+            {{ keyword }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="form-field">
+        <mat-label>Bid Amount</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="bidAmount"
+          required
+          min="0.01"
+          step="0.01"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="form-field">
+        <mat-label>Campaign Fund</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="campaignFund"
+          required
+          min="0.01"
+          step="0.01"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="form-field">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option
+            *ngFor="let status of campaignStatus | keyvalue"
+            [value]="status.value"
+          >
+            {{ status.value }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="form-field">
+        <mat-label>Town</mat-label>
+        <input
+          matInput
+          placeholder="Select a town"
+          [matAutocomplete]="townAuto"
+          formControlName="town"
+          required
+        />
+        <mat-autocomplete #townAuto="matAutocomplete">
+          <mat-option *ngFor="let town of filteredTowns()" [value]="town">
+            {{ town }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="form-field">
+        <mat-label>Radius (km)</mat-label>
+        <input matInput type="number" formControlName="radius" required min="1" />
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        class="form-field full-width"
+      >
+        {{ isEditMode ? 'Update Campaign' : 'Create Campaign' }}
+      </button>
+    </form>
+  </div>
+</div>

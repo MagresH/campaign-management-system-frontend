@@ -1,9 +1,22 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class KeywordService {
+  private apiUrl = 'http://localhost:8080/api/v1/keywords';
 
-  constructor() { }
+  constructor(private http: HttpClient) {}
+
+  getKeywordsByQuery(query: string): Observable<string[]> {
+    return this.http.get<string[]>(this.apiUrl, {
+      params: { query },
+    });
+  }
+
+  findOrCreateByValues(values: string[]): Observable<string[]> {
+    return this.http.post<string[]>(`${this.apiUrl}/batch`, values);
+  }
 }

@@ -1,0 +1,19 @@
+.campaign-list-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.campaign-list {
+  width: 80%;
+  max-width: 1200px;
+}
+
+table {
+  width: 100%;
+}
+
+mat-paginator {
+  margin-top: 10px;
+}

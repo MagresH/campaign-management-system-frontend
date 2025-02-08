@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {RouterModule, RouterOutlet} from '@angular/router';
+import {AccountBalanceComponent} from './components/account-balance/account-balance.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  template: `
+    <router-outlet></router-outlet>
+  `,
+  styles: [],
+  standalone: true,
+  imports: [AccountBalanceComponent, RouterOutlet],
 })
-export class AppComponent {
-  title = 'campaign-management-system-frontend';
-}
+export class AppComponent {}
