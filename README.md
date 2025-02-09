@@ -1,59 +1,53 @@
-# CampaignManagementSystemFrontend
+# Campaign Management System - Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.6.
+## Introduction
 
-## Development server
+The **Campaign Management System** is an application designed to manage advertising campaigns for products sold by various sellers. This system allows sellers to create, edit, and delete campaigns for their products and manage their products.
 
-To start a local development server, run:
+## Features
 
-```bash
-ng serve
-```
+- **Creating Sellers and Their Accounts**: The initial page allows the creation of seller profiles along with their associated accounts.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **CRUD Product Management**: Provides full Create, Read, Update, Delete (CRUD) operations for managing products associated with sellers.
 
-## Code scaffolding
+- **Starting Campaigns from Products**: From the product list, sellers can start creating campaigns for specific products.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- **CRUD Campaign Management**: Enables sellers to create, update, delete, and view advertising campaigns for their products.
 
-```bash
-ng generate component component-name
-```
+- **Keyword Search Handling**: Supports searching for campaign keywords with an autocomplete feature based on the letters typed into the keywords field, fetching results from the backend.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- **Town List Sharing**: Offers a dropdown list of towns fetched from the backend to be used in campaigns.
 
-```bash
-ng generate --help
-```
+- **Form Validation**: Includes validation mechanisms to ensure that data entered into forms is correct and complete before processing.
 
-## Building
+- **Navbar with Tabs**: Provides a navigation bar with tabs for `Products` and `Campaigns`.
 
-To build the project run:
+- **Account Balance Display in Navbar**: Displays the current account balance in the navbar, which updates upon operations on campaigns (adding, updating campaign funds, or deleting campaigns).
 
-```bash
-ng build
-```
+- **Logout Button in Navbar**: Allows sellers to "log out" by deleting their profile and creating a new one, available in the navbar.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Frontend Stack
 
-## Running unit tests
+The frontend of the **Campaign Management System** is built using the following technologies:
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+- **Angular**
 
-```bash
-ng test
-```
+- **Angular Material**
 
-## Running end-to-end tests
+## Installation
 
-For end-to-end (e2e) testing, run:
+To install and run the **Campaign Management System** frontend, follow these steps:
 
-```bash
-ng e2e
-```
+1. **Install dependencies:**
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+    ```bash
+    npm install
+    ```
 
-## Additional Resources
+2. **Serve the application:**
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+    ```bash
+    ng serve
+    ```
+
+These commands will install the necessary dependencies and run the application, ensuring that it is properly set up for development or production use.
