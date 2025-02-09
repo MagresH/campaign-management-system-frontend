@@ -1,24 +1,29 @@
-// campaign-list.component.ts
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { CampaignService, Campaign } from '../../services/campaign.service';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Campaign, CampaignService} from '../../services/campaign.service';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {
   MatCell,
   MatCellDef,
   MatColumnDef,
   MatHeaderCell,
-  MatHeaderCellDef, MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
   MatTable,
   MatTableDataSource
 } from '@angular/material/table';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {RouterLink} from '@angular/router';
 import {MatIcon} from '@angular/material/icon';
+import {AccountBalanceService} from '../../services/account-balance.service';
 
 @Component({
   selector: 'app-campaign-list',
   templateUrl: './campaign-list.component.html',
   styleUrls: ['./campaign-list.component.css'],
+  standalone: true,
   imports: [
     MatTable,
     MatButton,
@@ -49,7 +54,9 @@ export class CampaignListComponent implements OnInit {
 
   sellerId: string | null = null;
 
-  constructor(private campaignService: CampaignService) {}
+  constructor(
+    private campaignService: CampaignService,
+    private accountBalanceService : AccountBalanceService) {}
 
   ngOnInit(): void {
     this.sellerId = localStorage.getItem('sellerId');
@@ -67,6 +74,7 @@ export class CampaignListComponent implements OnInit {
         this.totalElements = data.totalElements;
         this.pageIndex = data.number;
         this.pageSize = data.size;
+        this.accountBalanceService.fetchBalance()
       },
       error: (error) => {
         console.error('Error deleting product:', error);
@@ -82,6 +90,7 @@ export class CampaignListComponent implements OnInit {
     this.campaignService.deleteCampaign(campaignId).subscribe({
       next: () => {
         this.dataSource.data = this.dataSource.data.filter(campaign => campaign.id !== campaignId);
+        this.accountBalanceService.fetchBalance()
       },
       error: (error) => {
         console.error('Error deleting product:', error);

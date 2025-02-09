@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { SellerService } from '../../services/seller.service';
-import { AccountService } from '../../services/account.service';
-import { AuthService } from '../../services/auth.service';
-import { FormsModule } from '@angular/forms';
+import {Component} from '@angular/core';
+import {Router} from '@angular/router';
+import {SellerService} from '../../services/seller.service';
+import {AccountService} from '../../services/account.service';
+import {AuthService} from '../../services/auth.service';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-seller-setup',

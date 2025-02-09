@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
-import {RouterModule, RouterOutlet} from '@angular/router';
+import {Component} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
 import {AccountBalanceComponent} from './components/account-balance/account-balance.component';
 import {NavbarComponent} from './navbar/navbar.component';
-import {Campaign} from './services/campaign.service';
 
 @Component({
   selector: 'app-root',

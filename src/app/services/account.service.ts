@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
 
 export interface Account {
   id: string;
@@ -12,7 +12,7 @@ export interface Account {
   providedIn: 'root',
 })
 export class AccountService {
-  private apiUrl = 'http://localhost:8080/api/v1/accounts';
+  private apiUrl = 'http://195.179.228.112:8080/api/v1/accounts';
 
   constructor(private http: HttpClient) {}
 

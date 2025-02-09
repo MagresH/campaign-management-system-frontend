@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { ProductService, Product } from '../../services/product.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Product, ProductService} from '../../services/product.service';
+import {ActivatedRoute, Router} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-product-form',
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.css'],
+  standalone: true,
   imports: [
     FormsModule
   ]
@@ -26,7 +27,7 @@ export class ProductFormComponent implements OnInit {
   ngOnInit(): void {
     this.sellerId = localStorage.getItem('sellerId');
     if (!this.sellerId) {
-      this.router.navigate(['/']);
+      this.router.navigate(['/seller-setup']);
       return;
     }
 

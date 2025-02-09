@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { ProductService, Product } from '../../services/product.service';
-import { Router, RouterLink } from '@angular/router';
-import { CurrencyPipe, NgForOf } from '@angular/common';
+import {Component, OnInit} from '@angular/core';
+import {Product, ProductService} from '../../services/product.service';
+import {Router, RouterLink} from '@angular/router';
+import {CurrencyPipe, NgForOf} from '@angular/common';
 
 @Component({
   selector: 'app-product-list',
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css'],
+  standalone: true,
   imports: [
     CurrencyPipe,
     RouterLink,

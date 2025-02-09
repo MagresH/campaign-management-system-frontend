@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
 
 export enum CampaignStatus {
   ON = 'ON',
@@ -32,7 +32,7 @@ export interface Campaign {
   providedIn: 'root',
 })
 export class CampaignService {
-  private apiUrl = 'http://localhost:8080/api/v1/campaigns';
+  private apiUrl = 'http://195.179.228.112:8080/api/v1/campaigns';
 
   constructor(private http: HttpClient) {}
 

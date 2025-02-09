@@ -1,32 +1,23 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  FormControl, ReactiveFormsModule,
-} from '@angular/forms';
-import { CampaignService, Campaign, CampaignStatus } from '../../services/campaign.service';
-import { ProductService, Product } from '../../services/product.service';
-import { KeywordService } from '../../services/keyword.service';
-import { LocationService } from '../../services/location.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { of } from 'rxjs';
-import { debounceTime, switchMap, catchError, distinctUntilChanged } from 'rxjs/operators';
-import {MatChipGrid, MatChipInput, MatChipInputEvent, MatChipRow} from '@angular/material/chips';
-import {
-  MatAutocomplete,
-  MatAutocompleteSelectedEvent,
-  MatAutocompleteTrigger,
-  MatOption
-} from '@angular/material/autocomplete';
+import {ChangeDetectionStrategy, Component, computed, inject, OnInit, signal} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators,} from '@angular/forms';
+import {Campaign, CampaignService, CampaignStatus} from '../../services/campaign.service';
+import {Product, ProductService} from '../../services/product.service';
+import {KeywordService} from '../../services/keyword.service';
+import {LocationService} from '../../services/location.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import {of} from 'rxjs';
+import {catchError, debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
+import {MatChipGrid, MatChipInput, MatChipInputEvent, MatChipRow, MatChipsModule} from '@angular/material/chips';
+import {MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatOption} from '@angular/material/autocomplete';
 import {KeyValuePipe, NgForOf} from '@angular/common';
 import {MatFormField, MatLabel, MatSelect} from '@angular/material/select';
 import {MatInput} from '@angular/material/input';
-import {MatIcon} from '@angular/material/icon';
+import {MatIcon, MatIconModule} from '@angular/material/icon';
 import {MatButton} from '@angular/material/button';
-import { AuthService } from '../../services/auth.service';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {AccountBalanceService} from '../../services/account-balance.service';
 
 @Component({
   selector: 'app-campaign-form',
@@ -40,6 +31,10 @@ import { AuthService } from '../../services/auth.service';
     MatOption,
     MatLabel,
     KeyValuePipe,
+    MatIconModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    FormsModule,
     MatSelect,
     MatFormField,
     ReactiveFormsModule,
@@ -81,7 +76,7 @@ export class CampaignFormComponent implements OnInit {
     private productService: ProductService,
     private keywordService: KeywordService,
     private locationService: LocationService,
-    private authService: AuthService,
+    private accountBalanceService: AccountBalanceService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -92,7 +87,6 @@ export class CampaignFormComponent implements OnInit {
       status: [CampaignStatus.ON, Validators.required],
       town: ['', Validators.required],
       radius: [null, [Validators.required, Validators.min(1)]],
-      productId: ['', Validators.required], // Add this line
     });
 
   }
@@ -134,8 +128,6 @@ export class CampaignFormComponent implements OnInit {
     });
   }
 
-
-
   loadProducts() {
     this.productService.getProductsBySellerId(this.sellerId!).subscribe({
       next: (products) => {
@@ -157,12 +149,14 @@ export class CampaignFormComponent implements OnInit {
       },
     });
   }
+
   loadCampaign() {
     this.campaignService.getCampaignById(this.campaignId!).subscribe({
       next: (campaign) => {
         this.campaignForm.patchValue(campaign);
         this.selectedKeywords.set(campaign.keywords);
         this.productId = campaign.productId;
+        this.accountBalanceService.fetchBalance();
       },
       error: (error) => {
         console.error('Error loading campaign:', error);
@@ -170,13 +164,17 @@ export class CampaignFormComponent implements OnInit {
     });
   }
 
-
-
   saveCampaign() {
     if (this.campaignForm.invalid) {
       alert('Please fill in all required fields.');
+      console.log('Form invalid:');
+      Object.keys(this.campaignForm.controls).forEach(key => {
+        const control = this.campaignForm.get(key);
+        console.log(`${key}: ${control?.valid}`);
+      });
       return;
     }
+
     const productId = this.productId;
     const sellerId = this.sellerId!;
 
@@ -200,11 +198,30 @@ export class CampaignFormComponent implements OnInit {
       this.campaignService.updateCampaign(this.campaignId!, campaign).subscribe({
         next: () => {
           this.router.navigate(['/campaigns']);
+          this.accountBalanceService.fetchBalance();
         },
         error: (error) => {
+          if (error.status === 400 && error.error.message === 'Insufficient funds') {
+            alert('Insufficient funds to create or update the campaign. Please check your account balance.');
+          } else {
+            console.error('Error updating campaign:', error);
+          }
         },
       });
     } else {
+      this.campaignService.createCampaign(campaign).subscribe({
+        next: () => {
+          this.router.navigate(['/campaigns']);
+          this.accountBalanceService.fetchBalance();
+        },
+        error: (error) => {
+          if (error.status === 400 && error.error.message === 'Insufficient funds') {
+            alert('Insufficient funds to create or update the campaign. Please check your account balance.');
+          } else {
+            console.error('Error creating campaign:', error);
+          }
+        },
+      });
     }
   }
 

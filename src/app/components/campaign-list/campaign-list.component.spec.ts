@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { CampaignListComponent } from './campaign-list.component';
+import {CampaignListComponent} from './campaign-list.component';
 
 describe('CampaignListComponent', () => {
   let component: CampaignListComponent;

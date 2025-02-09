@@ -1,6 +1,6 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
-import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptors } from '@angular/common/http';
+import {provideHttpClient } from '@angular/common/http';
 
 import { provideRouter, Routes } from '@angular/router';
 
@@ -10,7 +10,6 @@ import { ProductFormComponent } from './app/components/product-form/product-form
 import { CampaignListComponent } from './app/components/campaign-list/campaign-list.component';
 import { CampaignFormComponent } from './app/components/campaign-form/campaign-form.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import {authInterceptor,} from './app/auth.interceptor';
 
 const routes: Routes = [
   { path: '', component: SellerSetupComponent },
@@ -21,13 +20,12 @@ const routes: Routes = [
   { path: 'campaigns', component: CampaignListComponent },
   { path: 'campaigns/new', component: CampaignFormComponent },
   { path: 'campaigns/new/:productId', component: CampaignFormComponent },
-  { path: 'campaigns/edit/:productId', component: CampaignFormComponent },
+  { path: 'campaigns/edit/:id', component: CampaignFormComponent },
 ];
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(
-      withInterceptors([authInterceptor])
     ),
     provideRouter(routes),
     provideAnimationsAsync(),

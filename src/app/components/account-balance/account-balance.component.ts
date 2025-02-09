@@ -1,13 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AccountService } from '../../services/account.service';
-import { AuthService } from '../../services/auth.service';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {AccountBalanceService} from '../../services/account-balance.service';
+import {Subscription} from 'rxjs';
 import {CurrencyPipe, NgIf} from '@angular/common';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-account-balance',
   templateUrl: './account-balance.component.html',
   styleUrls: ['./account-balance.component.css'],
+  standalone: true,
   imports: [
     CurrencyPipe,
     NgIf
@@ -15,36 +16,24 @@ import {CurrencyPipe, NgIf} from '@angular/common';
 })
 export class AccountBalanceComponent implements OnInit, OnDestroy {
   balance: number = 0;
-  sellerId: string | null = null;
   private subscription!: Subscription;
+  private sellerSubscription!: Subscription;
+  sellerId: String | null = null;
 
   constructor(
-    private accountService: AccountService,
-    private authService: AuthService
+    private authService: AuthService,
+    private accountBalanceService: AccountBalanceService
   ) {}
 
   ngOnInit(): void {
-    // Subskrybujemy zmiany sellerId
-    this.subscription = this.authService.sellerId$.subscribe((sellerId) => {
-      this.sellerId = sellerId;
-      if (this.sellerId) {
-        this.fetchBalance();
-      } else {
-        this.balance = 0;
+    this.subscription = this.accountBalanceService.balance$.subscribe((balance) => {
+      this.balance = balance;
+    });
+    this.sellerSubscription = this.authService.sellerId$.subscribe((sellerId) => {
+      if (sellerId) {
+        this.sellerId = sellerId;
       }
-    });
-  }
-
-  fetchBalance(): void {
-    this.accountService.getBalanceBySellerId(this.sellerId!).subscribe({
-      next: (balance) => {
-        this.balance = balance;
-      },
-      error: (error) => {
-        console.error('Error fetching account balance:', error);
-        this.balance = 0;
-      },
-    });
+    })
   }
 
   ngOnDestroy(): void {

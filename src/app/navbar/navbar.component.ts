@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Router, RouterLink} from '@angular/router';
 import {MatAnchor, MatButton} from '@angular/material/button';
-import { MatToolbar } from '@angular/material/toolbar';
+import {MatToolbar} from '@angular/material/toolbar';
 import {AuthService} from '../services/auth.service';
 import {SellerService} from '../services/seller.service';
 import {AccountBalanceComponent} from '../components/account-balance/account-balance.component';
 import {NgIf} from '@angular/common';
+import {AccountBalanceService} from '../services/account-balance.service';
 
 @Component({
   selector: 'app-navbar',
@@ -27,13 +28,15 @@ export class NavbarComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private sellerService: SellerService
+    private sellerService: SellerService,
+    private accountBalanceService: AccountBalanceService
   ) {}
 
   ngOnInit(): void {
     this.authService.sellerId$.subscribe((sellerId) => {
       this.sellerId = sellerId;
     });
+
   }
 
   logout(): void {
